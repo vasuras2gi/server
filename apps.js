@@ -42,11 +42,23 @@ io.on("connection",(socket) => {
     //socket.emit("welcome",`welcome to the server`);
     //socket.broadcast.emit("welcome",`${socket.id} joined the server`);
 
-    socket.on("message",({room, message})=>{
-        console.log(room, message);
-        //socket.broadcast.emit("receive-message",data);
-        io.to(room).emit("receive-message",message);
-    })
+    // socket.on("message",({room, message})=>{
+    //     console.log(room, message);
+    //     //socket.broadcast.emit("receive-message",data);
+    //     io.to(room).emit("receive-message",message);
+    // })
+
+    socket.on("message", ({ message, room, type }) => {
+    // room variable ke andar ya toh roomName hoga ya phir Socket ID
+    
+    if (type === "personal") {
+        // Single user ko bhejne ke liye
+        io.to(room).emit("receive-message", { message, sender: socket.id, type: "personal" });
+    } else {
+        // Poore room ko bhejne ke liye
+        io.to(room).emit("receive-message", { message, sender: socket.id, type: "room" });
+    }
+    });
 
     socket.on("join-room",(room)=>{
         socket.join(room);
