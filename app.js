@@ -46,12 +46,17 @@ io.on("connection", (socket) => {
     console.log(`user joined room ${room}`);
   });
 
-socket.on("message", ({ room, message }) => {
-  io.to(room).emit("receive-message", {
-    message,
-    sender: socket.id
-  });
-});
+    socket.on("message", ({ message, room, type }) => {
+    // room variable ke andar ya toh roomName hoga ya phir Socket ID
+    
+      if (type === "personal") {
+          // Single user ko bhejne ke liye
+          io.to(room).emit("receive-message", { message, sender: socket.id, type: "personal" });
+      } else {
+          // Poore room ko bhejne ke liye
+          io.to(room).emit("receive-message", { message, sender: socket.id, type: "room" });
+      }
+      });
 
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
